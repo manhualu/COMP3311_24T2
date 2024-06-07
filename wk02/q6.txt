@@ -1,0 +1,25 @@
+Q6. Describe the different semantics suggested by each of these diagrams.
+
+Similarity: 
+    Many to many relationship. 
+    A Researcher has to work on 0 or more Projects, a Project has to be worked on by ONE or more Researchers. 
+
+Differences: 
+    The time attribute is associated with different parts. 
+    It's on the relationship in Diagram A, whereas it's on the entity Project in Diagram B.
+
+    Diagram A:
+    - Time attribute is on the relationship. 
+    - Time would be tracked for how much time a Researcher spends on a Project. 
+    e.g. 
+        John works on Project1 for 10hrs. 
+        John works on Project2 for 2hrs.
+        Mary works on Project1 for 5hrs.
+
+    Diagram B: 
+    - Time attribute is ONLY on the Project entity. 
+    - Time would be tracked only for the total time that was spent on the Project, we wouldn't know how much time each Researcher spent on a particular Project. 
+    e.g. 
+        (based on example above)
+        Project1 has been worked on for 15hrs (10 + 5).
+        Project2 has been worked on for 2hrs.
