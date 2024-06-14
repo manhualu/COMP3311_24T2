@@ -1,0 +1,15 @@
+Single table with nulls 
+
+R: 
+    id is NOT NULL 
+    a is NOT NULL 
+    b is NOT NULL 
+    c is NULL
+    d is NULL
+
+S:
+    id is NOT NULL 
+    a is NOT NULL 
+    b is NULL 
+    c is NOT NULL
+    d is NULL
