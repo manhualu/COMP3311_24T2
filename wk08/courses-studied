@@ -1,0 +1,89 @@
+#!/usr/bin/python3
+
+"""
+Q5. 
+"""
+import sys
+import psycopg2
+
+if len(sys.argv) < 3:
+    print(f"Usage: {sys.argv[0]} subject term")
+    exit(1)
+
+course = sys.argv[1]
+term = sys.argv[2]
+
+conn = None
+
+courseQuery = """
+select   s.longname
+from     Subjects s 
+where    s.code = %s
+"""
+
+termQuery = """
+select   *
+from     Terms t
+where    t.code = %s
+"""
+
+offeringQuery = """
+select  *
+from    Courses c 
+join    Subjects s on (c.subject = s.id)
+join    Terms t on (c.term = t.id)
+where   s.code = %s and t.code = %s
+"""
+
+studentsInCourseQuery = """
+select p.id, p.family, p.given
+from   Subjects s
+       join Courses c on (c.subject=s.id)
+       join Terms t on (c.term=t.id)
+       join Course_enrolments e on (e.course=c.id)
+       join People p on (e.student=p.id)
+where  s.code = %s and t.code = %s
+order  by p.family, p.given
+"""
+
+try:
+    conn = psycopg2.connect("dbname=uni")
+    cur = conn.cursor()
+
+    cur.execute(courseQuery, [course])
+    foundCourse = cur.fetchOne()
+
+    if foundCourse is None:
+        print(f"Invalid subject {course}")
+        exit(0)
+
+    cur.execute(termQuery, [term])
+    foundTerm = cur.fetchOne()
+
+    if foundTerm is None:
+        print(f"Invalid term {term}")
+        exit(0)
+
+    cur.execute(offeringQuery, [course, term])
+    foundOffering = cur.fetchOne()
+
+    if foundOffering is None:
+        print(f"No offering: {course} {term} ")
+        exit(0)
+
+    cur.execute(studentsInCourseQuery, [course, term])
+    students = cur.fetchall()
+
+    print(f"{course} {term}")
+    if len(students) == 0:
+        print("No students")
+        exit(0)
+
+    for zID, lastName, firstName in students:
+        print(f"{zID} {lastName}, {firstName}")
+
+except psycopg2.Error as err:
+    print("database error: ", err)
+finally:
+    if conn is not None:
+        conn.close()
