@@ -1,0 +1,294 @@
+Q1. Functional Dependencies
+a. What functional dependencies are implied if we know that a set of attributes X is a candidate key for a relation R?
+    Schema: R
+    FD: X -> (R - X)
+    i.e. X functionally determines all other attributes in R.
+
+b. What functional dependencies can we infer do not hold by inspection of the following relation? 
+    Is NOT FD (because RHS values appears for multiple diff LHS values): 
+    A -> C
+    B -> C 
+    AB -> C 
+    C -> B 
+    C -> A 
+    B -> A 
+
+    Is FD: 
+    A -> B 
+    BC -> A 
+    AC -> B
+
+
+c. Suppose that we have a relation schema R(A,B,C) representing a relationship between two entity sets E and F with keys A and B respectively, and suppose that R has (at least) the functional dependencies A → B and B → A.
+Explain what this tells us about the relationship between E and F. 
+
+    Step 1) Extract useful information
+    R(A,B,C)
+    A -> B
+    B -> A
+    Entity Set E with key A
+    Entity Set F with key B
+
+    What is an entity set?
+        Entity Set == Set of Entities == Table containing individual entity values 
+
+Explain the relationship between E and F
+
+    Step 2) Break down the info 
+    A determines B
+    B determines A
+
+    ER diagram question
+
+    A is a foreign key to B
+    B is a foreign key to A
+
+    A is a primary key for E
+    B is a primary key for F
+
+    What does relationship mean in an ER diagram?
+        one to one, one to many, many to many
+    
+    one to one relationship between A and B (A == B)
+
+    Step 3) Answer the Question
+    one to one relationship between E and F
+
+Q2. Closure
+Consider the relation R(A,B,C,D,E,F,G) and the set of functional dependencies F = { A → B, BC → F, BD → EG, AD → C, D → F, BEG → FA } compute the following:
+    a. A+
+        A (A->B)
+        AB 
+
+        A+ = {AB}
+    
+    b. ACEG+
+        ACEG (A->B)
+        ABCEG (BC->F)
+        ABCEFG
+
+        ACEG+ = {ABCEFG}
+
+    c. BD+
+        BD (BD -> EG)
+        BDEG (BEG -> FA)
+        ABDEFG (AD -> C)
+        ABCDEFG
+
+        BD+ = {ABCDEFG}
+
+        BD is a candidate key, so is also a super key.
+
+
+Q3. Closure + Candidate Keys 
+R(A,B,C,D,E)
+F = { A → B, BC → E, ED → A }
+
+    a. List all of the candidate keys for R. 
+
+    General method for getting candidate keys (not perfect but will get you most candidate keys)
+    1) Start with the LHS of each FD
+    2) Add on and use the FD's to get the closure to be equal to the Schema
+    3) LHS is the candidate key when we have the closure
+
+    Start with A
+    A -> AB (A->B)
+    AC -> ABC (reflextivity of C)
+    AC -> ABCE (BC->E)
+    ACD -> ABCDE (reflextivity of D)
+
+    ACD -> R
+
+    ACD is a candidate key (because is no subset of ACD that is also a candidate key, so cannot be reduced)
+    --------------------------------------------------------------------------------------------------
+    Start with B
+    B -> B
+    BC -> BCE (BC -> E)
+    BCD -> BCDE 
+    BCD -> ABCDE (ED -> A)
+
+    BCD is a candidate key
+    --------------------------------------------------------------------------------------------------
+    Start with ED 
+    ED -> ADE (ED -> A)
+    ED -> ABDE (A -> B)
+    EDC -> ABCDE
+
+    CDE is a candidate key
+
+    Candidate keys: ACD, BCD, CDE 
+
+For other candidate keys not found through this method, it will require Guess and Check AKA bruteforcing
+
+
+b. Is R in 3NF?
+
+    DETECTING 3NF: 
+    - If an FD passes any of these conditions, it is in 3NF.
+    - If an FD fails all of these conditions, it is not in 3NF.
+    - If all FDs are in 3NF, the schema is in 3NF.
+    - If any FD is not in 3NF, the schema is not in 3NF.
+
+    3NF RULES:
+    1. Is the RHS a subset of the LHS? 
+    2. Is the LHS a superkey?
+    3. Is the RHS only 1 attribute and part of a candidate key? 
+
+    A -> B: in 3NF, satisfies Rule 3
+    BC -> E: in 3NF, satisfies Rule 3
+    ED -> A: in 3NF, satisfies Rule 3
+
+    All FDs are in 3NF therefore R is in 3NF
+
+
+c. Is R in BCNF? 
+
+    DETECTING BCNF:
+    - If an FD passes any of these conditions, it is in BCNF
+    - If an FD fails all of these conditions, it is not in BCNF
+    - If all FDs are in BCNF, the schema is in BCNF
+    - If any FD is not in BCNF, the schema is not in BCNF
+
+    BCNF RULES:
+    1. Is the RHS a subset of the LHS? 
+    2. Is the LHS a superkey?
+
+    A -> B: not in BCNF, does not satisfy Rule 1 or Rule 2
+        (can stop here, don't have to look at rest of FDs)
+    
+    NOT all FDs are in BCNF, therefore R is NOT in BCNF
+
+
+Q13. Minimal Cover
+F   =   { B → A,  D → A,  AB → D }
+
+    Step 1. Convert the FD's into canonical cover (everything is already in canonical cover)
+
+    Step 2. For LHS that are multi attribute, remove any redundant ones
+    B -> A  (reflextivity)
+    B -> AB (AB -> D)
+    B -> AB -> D (transitivity rule)
+    B -> D
+
+    F = {B->A, D->A, B->D}
+    
+    Step 3. Remove any redundant FD's
+    B -> D -> A
+    B -> A is redundant (transitivity)
+    It's possible to infer B->A from {B->D, D->A}
+
+F = {D->A, B->D}
+
+Therefore, minimal cover of F = {D->A, B->D}
+
+
+Q7. 3NF Decomposition
+    b) i. B → C, D → A
+    Schema: ABCD 
+
+    Is the schema in 3NF?
+        If YES -> done
+        If NO -> Continue to step 1
+
+    Step 1) Find the minimal cover of FD
+    FD =  {B->C, D->A}
+
+    Step 2) We need to flatten the minimal cover
+    BC, DA
+
+    Step 3) Ensure that the resulting set had a candidate key (add one if it doesn't exist)
+    Candidate Key: BD
+
+    => 3NF Decomposition: BC, DA, BD
+
+
+Q7. BCNF Decomposition:
+
+    BCNF RULES:
+    1. Is the RHS a subset of the LHS? 
+    2. Is the LHS a superkey?
+
+    e) ii. AB → C, AB → D, C → A, D → B
+    Schema: ABCD 
+    
+    First Pass {ABCD}
+        Schema: ABCD 
+        Relevant FDs = {AB → C, AB → D, C → A, D → B}
+        AB -> C: is BCNF (Rule 2)
+        AB -> D: is BCNF (Rule 2)
+        C -> A: not in BCNF
+
+        New Schema Set: {ABCD - A, C+A} => {BCD, CA}
+
+    Second Pass {BCD, CA}
+        Schema: BCD
+        Relevant FDs = {D → B}
+        D → B: not in BCNF (D -> DB (not a superkey because missing C))
+
+        New Schema Set: {BCD - B, D+B, CA} => {CD, DB, CA}
+
+    Third Pass {CD, DB, CA}
+        Schema: CD
+        Relevant FDs = no relevant FDs
+        CD is in BCNF (Rule 2)
+
+        Schema: DB
+        Relevant FDs = {B → D, D → B}
+        B → D: in BCNF (Rule 2)
+        D → B: in BCNF (D -> DB => Rule 2 <- and only has to satisfy for this schema i.e. DB)
+        DB is in BCNF
+
+        Schema: CA
+        Relevant FDs = {C → A}
+        C -> A: is in BCNF (C -> CA => Rule 2)
+        CA is in BCNF
+
+=> CD, DB, CA are all BCNF
+
+Therefore BCNF Decomposition: CD, DB, CA
+
+
+Q15.
+R = ABCDEFGH
+F = { ABH → C, A → DE, BGH → F, F → ADH, BH → GE }
+Produce a BCNF decomposition of R.
+
+    First Pass {ABCDEFGH}
+        Schema: ABCDEFGH
+        Relevant FDs = {ABH → C, A → DE, BGH → F, F → ADH, BH → GE}
+        ABH → C: is BCNF (Rule 2)
+        A → DE: is not in BCNF
+
+        New Schema Set: {ABCDEFGH - DE, A+DE} => {ABCFGH, ADE}
+
+    Second Pass {ABCFGH, ADE}
+        Schema: ABCFGH
+        Relevant FDs = {ABH → C, BGH → F, F → AH, BH → G} <-- note that F -> ADH can be split up into {F -> A, F -> D, F -> H} because of projectivity, where F -> D is not relevant and is removed. Same as BH → GE which can be split up into {BH -> G, BH -> E}, where BH -> E is not relevant.
+        ABH → C: in BCNF (Rule 2)
+        BGH → F: in BCNF (Rule 2)
+        F → AH: not in BCNF
+
+        New Schema Set: {ABCFGH - AH, F+AH, ADE} => {BCFG, FAH, ADE}
+
+    Third Pass {BCFG, FAH, ADE}
+        Schema: BCFG
+        Relevant FDs: = no relevant FDs <-- note that we cannot use ABH → C because we don't have A in the current schema and we can't break down the LHS of a FD, we can only break down the RHS of a FD. F → ADH can be split up into {F -> A, F -> D, F -> H}, where none of them are relevant. BH -> GE is not relevant because no H
+        BCFG in BCNF 
+
+        Schema Set: {BCFG, FAH, ADE}
+
+        Schema: FAH
+        Relevant FDs: { F → AH }
+        F → AH: in BCNF (Rule 2)
+
+        Schema Set: {BCFG, FAH, ADE}
+    
+        Schema: ADE
+        Relevant FDs: { A → DE }
+        A → DE: in BCNF (Rule 2)
+        
+        Schema Set: {BCFG, FAH, ADE}
+
+=> CD, DB, CA are all BCNF
+
+Therefore BCNF Decomposition: BCFG, FAH, ADE
